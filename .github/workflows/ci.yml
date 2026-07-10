@@ -8,10 +8,6 @@ on:
   pull_request:
     branches: ["main"]
 
-  # Atau schedule: setiap hari jam 1 pagi
-  # schedule:
-  #   - cron: "0 1 * * *"
-
 jobs:
   hello:
     runs-on: ubuntu-latest
@@ -39,4 +35,24 @@ jobs:
           pip install flake8
 
       - name: Run linter
-        run: flake8 app.py --max-line-length=120
+        run: flake8 app.py test_app.py --max-line-length=120
+
+  test:
+    needs: lint # baru jalan setelah lint sukses
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pytest
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run unit tests
+        run: pytest test_app.py -v
